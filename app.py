@@ -7,6 +7,17 @@ st.set_page_config(
 )
 
 # =========================
+# Slides carregados de arquivo TXT
+# Cada linha = 1 slide
+# =========================
+with open("slides.txt", "r", encoding="utf-8") as file:
+    slides = [
+        {"content": line.strip()}
+        for line in file.readlines()
+        if line.strip()
+    ]
+
+# =========================
 # CSS: slides centralizados + placar fixo no rodapé
 # =========================
 st.markdown(
@@ -81,25 +92,10 @@ if "slide" not in st.session_state:
 
 if "scores" not in st.session_state:
     st.session_state.scores = {
-        "Igot": 0,
-        "Tatá": 0,
-        "Tenshi": 0,
+        "Igot": 50,
+        "Tatá": 50,
+        "Tenshi": 50,
     }
-
-shortcut_map = {
-    "Igot": ("1", "Shift+1"),
-    "Tatá": ("2", "Shift+2"),
-    "Tenshi": ("3", "Shift+3"),
-}
-
-# =========================
-# Slides (apenas conteúdo)
-# =========================
-slides = [
-    {"content": "Bem-vindo à apresentação."},
-    {"content": "Aqui você pode colocar qualquer texto."},
-    {"content": "O placar continua visível o tempo todo."},
-]
 
 # =========================
 # Área dos slides (centralizada vertical e horizontalmente)
@@ -112,7 +108,7 @@ with st.container(key="slides"):
         f"""
         <div style="
             text-align: center;
-            font-size: 3.5rem;
+            font-size: 10rem;
             font-weight: 600;
             line-height: 1.4;
             width: 100%;
@@ -146,7 +142,10 @@ with st.container(key="placar"):
 
     player_cols = st.columns(len(st.session_state.scores))
 
-    for player, player_col in zip(st.session_state.scores, player_cols):
+    for index, (player, player_col) in enumerate(
+        zip(st.session_state.scores, player_cols),
+        start=1
+    ):
 
         with player_col:
 
@@ -158,14 +157,12 @@ with st.container(key="placar"):
 
             minus, plus = st.columns(2)
 
-            minus_shortcut, plus_shortcut = shortcut_map[player]
-
             with minus:
                 with st.container(horizontal=True, horizontal_alignment="right"):
                     if st.button(
                         "-",
                         key=f"minus_{player}",
-                        shortcut=minus_shortcut,
+                        shortcut=str(index),
                         type="secondary" # change to tertiary to hide
                     ):
                         st.session_state.scores[player] -= 1
@@ -176,7 +173,7 @@ with st.container(key="placar"):
                 if st.button(
                     "+",
                     key=f"plus_{player}",
-                    shortcut=plus_shortcut,
+                    shortcut=f"Shift+{index}",
                     type="secondary" # change to tertiary to hide
                 ):
                     st.session_state.scores[player] += 1
