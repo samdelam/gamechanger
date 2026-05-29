@@ -2,13 +2,13 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Apresentação com Placar",
+    page_title="Game Changer",
     layout="wide"
 )
 
 # =========================
-# Slides carregados de arquivo TXT
-# Cada linha = 1 slide
+# Slides loaded from slides.txt
+# Each line = 1 slide
 # =========================
 with open("slides.txt", "r", encoding="utf-8") as file:
     slides = [
@@ -18,26 +18,49 @@ with open("slides.txt", "r", encoding="utf-8") as file:
     ]
 
 # =========================
-# CSS: slides centralizados + placar fixo no rodapé
+# Players loaded from players.txt
+# Format:
+# Name;Name;StartingPoints
+# =========================
+if "scores" not in st.session_state:
+
+    st.session_state.scores = {}
+
+    with open("players.txt", "r", encoding="utf-8") as file:
+
+        for line in file.readlines():
+
+            line = line.strip()
+
+            if not line:
+                continue
+
+            name, score = line.split(";")
+
+            st.session_state.scores[name.strip()] = int(score.strip())
+
+
+# =========================
+# CSS: Centered slides and fixed scoreboard on footer
 # =========================
 st.markdown(
     """
     <style>
 
-    /* esconde o header padrão para aproveitar a tela inteira */
+    /* hides default streamlit header to maximize space usage */
     header[data-testid="stHeader"] {
         display: none !important;
     }
 
-    /* zera o padding/limite do container principal para o slide
-       poder ocupar a tela toda sem gerar scroll */
+    /* removes main container padding/limit so the slide can occupy
+       the entire screen without a scroll bar */
     [data-testid="stMainBlockContainer"] {
         padding: 0 !important;
         max-width: 100% !important;
     }
 
-    /* o container dos slides ocupa a tela inteira (descontando o
-       espaço do placar) e centraliza o conteúdo nos dois eixos */
+    /* slides container occupies a percentage of the whole screen
+       to adjust for the scoreboard space */
     .st-key-slides {
         box-sizing: border-box;
         min-height: 80vh;
@@ -49,13 +72,13 @@ st.markdown(
         text-align: center;
     }
 
-    /* esconde os botões de passar slide */
+    /* hides slides navigation's buttons (and possibly the scoreboard's) */
     button[kind="tertiary"] {
         display: none;
     }
 
-    /* placar colado na parte inferior da tela */
-    .st-key-placar {
+    /* fixed footer scoreboard */
+    .st-key-scoreboard {
         position: fixed;
         bottom: 0;
         left: 0;
@@ -66,12 +89,12 @@ st.markdown(
         z-index: 999;
     }
 
-    /* centraliza o texto dos jogadores e valores de seus placares */
-    .st-key-placar .stElementContainer {
+    /* centers text and points in the scoreboard */
+    .st-key-scoreboard .stElementContainer {
         text-align: center;
     }
 
-    /* esconde o atalho de teclado para botões */
+    /* hides the shortcut tooltip from buttons */
     .stButton kbd {
         display: none;
     }
@@ -81,24 +104,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Esconde os links de ancora nos headers, subheaders e markdown
+# Hides link anchor elements from default streamlit elements
 st.html("<style>[data-testid='stHeaderActionElements'] {display: none;}</style>")
 
 # =========================
-# Estado inicial
+# Initial state
 # =========================
 if "slide" not in st.session_state:
     st.session_state.slide = 0
 
-if "scores" not in st.session_state:
-    st.session_state.scores = {
-        "Igot": 50,
-        "Tatá": 50,
-        "Tenshi": 50,
-    }
-
 # =========================
-# Área dos slides (centralizada vertical e horizontalmente)
+# Slide area (centered horizontally and vertically)
 # =========================
 with st.container(key="slides"):
 
@@ -136,9 +152,9 @@ with st.container(key="slides"):
                     st.rerun()
 
 # =========================
-# Placar fixo no rodapé
+# Fixed scoreboard on footer
 # =========================
-with st.container(key="placar"):
+with st.container(key="scoreboard"):
 
     player_cols = st.columns(len(st.session_state.scores))
 
