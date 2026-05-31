@@ -12,9 +12,8 @@ st.set_page_config(
 # =========================
 with open("slides.txt", "r", encoding="utf-8") as file:
     slides = [
-        {"content": line.strip()}
-        for line in file.readlines()
-        if line.strip()
+        line.strip()
+        for line in file
     ]
 
 # =========================
@@ -68,8 +67,8 @@ st.markdown(
        to adjust for the scoreboard space */
     .st-key-slides {
         box-sizing: border-box;
-        min-height: calc(100vh - 230px);
-        max-height: calc(100vh - 230px);
+        min-height: 75vh; /* 100vh - scoreboard's height */
+        max-height: 75vh;
         padding: 2rem;
         display: flex !important;
         flex-direction: column;
@@ -93,7 +92,7 @@ st.markdown(
         padding: 10px 150px;
         border-top: 1px solid #444;
         z-index: 999;
-        height: 230px;
+        height: 25vh;
     }
 
     .st-key-scoreboard {
@@ -134,16 +133,16 @@ with st.container(key="slides"):
 
     current_slide = slides[st.session_state.slide]
 
-    text = current_slide["content"]
-
-    font_size = max(
-        2.5,
-        min(
-            10,
-            70 / (len(text) ** 0.5)
+    if current_slide:
+        font_size = max(
+            2.5,
+            min(
+                10,
+                70 / (len(current_slide) ** 0.5)
+            )
         )
-    )
-
+    else:
+        font_size = 10
 
     st.markdown(
         f"""
@@ -154,7 +153,7 @@ with st.container(key="slides"):
             line-height: 1.4;
             width: 100%;
         ">
-            {current_slide["content"]}
+            {current_slide}
         </div>
         """,
         unsafe_allow_html=True
