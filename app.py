@@ -20,7 +20,7 @@ with open("slides.txt", "r", encoding="utf-8") as file:
 # =========================
 # Players loaded from players.txt
 # Format:
-# Name;Name;StartingPoints
+# Name;StartingPoints
 # =========================
 if "scores" not in st.session_state:
 
@@ -47,7 +47,7 @@ st.markdown(
     """
     <style>
 
-    /* hides default streamlit header to maximize space usage */
+    /* hides default streamlit header */
     header[data-testid="stHeader"] {
         display: none !important;
     }
@@ -59,12 +59,18 @@ st.markdown(
         max-width: 100% !important;
     }
 
+    /* removes gap around the slide */
+    [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
+
     /* slides container occupies a percentage of the whole screen
        to adjust for the scoreboard space */
     .st-key-slides {
         box-sizing: border-box;
-        min-height: 80vh;
-        padding: 2rem 2rem 2rem 2rem;
+        min-height: calc(100vh - 230px);
+        max-height: calc(100vh - 230px);
+        padding: 2rem;
         display: flex !important;
         flex-direction: column;
         justify-content: center !important;
@@ -87,11 +93,19 @@ st.markdown(
         padding: 10px 150px;
         border-top: 1px solid #444;
         z-index: 999;
+        height: 230px;
     }
 
-    /* centers text and points in the scoreboard */
-    .st-key-scoreboard .stElementContainer {
-        text-align: center;
+    .st-key-scoreboard {
+        /* centers text and points in the scoreboard */
+        .stElementContainer {
+            text-align: center;
+        }
+
+        /* controls player and score font size */
+        h1, h2 {
+            font-size: 3rem !important;
+        }
     }
 
     /* hides the shortcut tooltip from buttons */
@@ -120,11 +134,22 @@ with st.container(key="slides"):
 
     current_slide = slides[st.session_state.slide]
 
+    text = current_slide["content"]
+
+    font_size = max(
+        2.5,
+        min(
+            10,
+            70 / (len(text) ** 0.5)
+        )
+    )
+
+
     st.markdown(
         f"""
         <div style="
             text-align: center;
-            font-size: 10rem;
+            font-size:{font_size}rem;
             font-weight: 600;
             line-height: 1.4;
             width: 100%;
@@ -165,7 +190,7 @@ with st.container(key="scoreboard"):
 
         with player_col:
 
-            st.subheader(player, anchor=None)
+            st.header(player)
 
             st.markdown(
                 f"# {st.session_state.scores[player]}"
