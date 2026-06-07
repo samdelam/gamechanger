@@ -31,9 +31,13 @@ CONFIG_SCHEMA = [
                 "type": "group",
                 "group_label": "### Slide shortcuts",
                 "group_key": "shortcuts",
+                "description": (
+                    "The keys \"C\" and \"R\" are reserved and can't be used, even with modifiers. "
+                    "Punctuation keys like \".\" and \",\" aren't currently supported."
+                ),
                 "fields": [
-                    {"type": "text", "label": "Next slide key", "key": "slide_next"},
                     {"type": "text", "label": "Previous slide key", "key": "slide_previous"},
+                    {"type": "text", "label": "Next slide key", "key": "slide_next"},
                     {"type": "text", "label": "Open settings key", "key": "settings"},
                 ],
             },
@@ -99,14 +103,15 @@ CONFIG_SCHEMA = [
                 "description": (
                     "Point shortcuts are assigned by player order. Press a number key "
                     "such as 1, 2, 3, and so on to add one point to that player. "
-                    "Press Shift+number, such as Shift+1 or Shift+2, to remove one point. "
+                    "Press Shift+number, such as Shift+1 or Shift+2, to remove one point.  \n"
                     "Change the Points Modifier key to use a modifier other than Shift. "
+                    "Allowed modifiers: Alt, Ctrl, Cmd, Meta, Mod, Option, Shift.  \n"
                     "Enable Invert point shortcuts to reverse that behavior, making the "
                     "number key remove points and modifier+number add points instead."
                 ),
                 "fields": [
                     {"type": "text", "label": "Points Modifier key", "key": "points_modifier"},
-                    {"type": "checkbox", "label": "Invert point shortcuts", "key": "points_inverted"},
+                    {"type": "checkbox", "label": "Invert point shortcuts modifier", "key": "points_inverted"},
                 ],
             },
         ],

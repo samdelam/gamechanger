@@ -31,7 +31,7 @@ CONFIG_DEFAULTS = {
         "shortcuts": {
             "slide_next": "ArrowRight",
             "slide_previous": "ArrowLeft",
-            "settings": "s",
+            "settings": "S",
         },
         "sounds": {
             "slide": True,
