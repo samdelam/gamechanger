@@ -5,6 +5,8 @@ A template to create slides with simple prompts and a fixed scoreboard that allo
 ## Web version
 
 - If you don't want to install python and streamlit, you can use the [Web Version](https://gamechanger-dropout.streamlit.app/)
+  - _The web version is a little laggy, so I do recommend installing and running it locally_
+- Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
 - On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
 - Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to import all settings next time you visit the page
 
@@ -16,6 +18,7 @@ Uses Python and Streamlit: https://docs.streamlit.io/get-started/installation
 
 - Run `streamlit run app.py`
 - Access localhost:http://localhost:8501/ if it didn't open up automatically
+- Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
 - On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
 - Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to automatically import all settings
 - Leaving the exported `config.json` file on the root folder will automatically import the settings when running the code, without the need to import manually
