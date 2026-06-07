@@ -30,8 +30,11 @@ def inject_font_css():
     )
 
 
-def inject_app_css():
-    slides_height = f"calc(100vh - {SCOREBOARD_HEIGHT} - ({SLIDES_MARGIN} * 2))"
+def inject_app_css(scoreboard_enabled=True):
+    if scoreboard_enabled:
+        slides_height = f"calc(100vh - {SCOREBOARD_HEIGHT} - ({SLIDES_MARGIN} * 2))"
+    else:
+        slides_height = f"calc(100vh - ({SLIDES_MARGIN} * 2))"
 
     st.markdown(
         f"""

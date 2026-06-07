@@ -25,7 +25,7 @@ init_session_state(text_slide_offset)
 changed_slide = slide_changed()
 
 # Global app styling
-inject_app_css()
+inject_app_css(scoreboard_enabled=st.session_state.scoreboard_enabled)
 
 # Main routing
 is_cover_slide = False

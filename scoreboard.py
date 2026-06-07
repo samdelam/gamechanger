@@ -4,10 +4,10 @@ import streamlit as st
 
 
 def render_scoreboard(text_slide_offset, is_cover_slide):
-    if st.session_state.edit_mode or is_cover_slide:
-        return
-
     ss = st.session_state
+
+    if st.session_state.edit_mode or is_cover_slide or not ss.scoreboard_enabled:
+        return
 
     with st.container(key="scoreboard"):
         visible_players = [

@@ -52,7 +52,7 @@ def _stage_players(players):
 
 def _stage_slides(slides):
     """Persist the current slide editor draft and refresh dynamic widget keys."""
-    st.session_state.edit_draft["slides"] = slides
+    st.session_state.edit_draft.setdefault("slides", {})["content"] = slides
     st.session_state.form_generation += 1
     st.rerun()
 
@@ -75,6 +75,20 @@ def _move_item(items, index, direction):
 
     return new_items
 
+
+
+
+def _deep_merge_output(base, override):
+    """Recursively merge renderer fragments so tabs can edit shared config groups."""
+    result = dict(base)
+
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = _deep_merge_output(result[key], value)
+        else:
+            result[key] = value
+
+    return result
 
 def _render_field(field, current_values, source_data, key_prefix, gen, default_path):
     """Render one leaf widget; return (key, value) or None if condition fails."""
@@ -100,8 +114,48 @@ def _render_field(field, current_values, source_data, key_prefix, gen, default_p
     return field_key, result
 
 
+
+
+def _group_leaf_fields(group):
+    """Return all renderable leaf fields from a group definition.
+
+    Groups can be declared either with a flat ``fields`` list or with a
+    column layout using ``columns``. This helper normalizes both shapes so
+    hidden conditional groups can preserve their values safely.
+    """
+    if group.get("layout") == "columns":
+        return [
+            field
+            for column in group.get("columns", [])
+            for field in column
+        ]
+
+    return group.get("fields", [])
+
+
+def _preserve_group_values(group, source_data, default_path_builder):
+    """Return existing values for a hidden group without touching unrelated keys."""
+    preserved = {}
+
+    for field in _group_leaf_fields(group):
+        if field["type"] == "group":
+            continue
+
+        preserved[field["key"]] = _widget_value(
+            source_data,
+            field["key"],
+            default_path_builder(field),
+        )
+
+    return preserved
+
+
 def _render_field_grid(fields, current_values, source_data, key_prefix, gen, default_path_builder, max_columns=3):
-    """Render fields in compact rows instead of stretching every input full width."""
+    """Render fields in compact rows instead of stretching every input full width.
+
+    Hidden conditional fields are still preserved in the returned config so
+    applying the form does not reset them to defaults.
+    """
     output = {}
     visible_fields = []
 
@@ -109,6 +163,11 @@ def _render_field_grid(fields, current_values, source_data, key_prefix, gen, def
     for field in fields:
         condition = field.get("condition")
         if condition and not condition({**current_values, **output}):
+            output[field["key"]] = _widget_value(
+                source_data,
+                field["key"],
+                default_path_builder(field),
+            )
             continue
         visible_fields.append(field)
 
@@ -123,6 +182,48 @@ def _render_field_grid(fields, current_values, source_data, key_prefix, gen, def
                     {**current_values, **output},
                     source_data,
                     key_prefix,
+                    gen,
+                    default_path_builder(field),
+                )
+                if pair:
+                    output[pair[0]] = pair[1]
+
+    return output
+
+
+def _render_field_columns(columns, current_values, source_data, key_prefix, gen, default_path_builder):
+    """Render grouped fields as vertical stacks inside columns.
+
+    This is useful for paired settings such as:
+    - Gain points sound
+      Gain sound delay
+    - Lose points sound
+      Lose sound delay
+
+    Hidden conditional fields are preserved, matching _render_field_grid().
+    """
+    output = {}
+    column_containers = st.columns(len(columns))
+
+    for column_index, fields in enumerate(columns):
+        with column_containers[column_index]:
+            for field in fields:
+                condition = field.get("condition")
+                values_so_far = {**current_values, **output}
+
+                if condition and not condition(values_so_far):
+                    output[field["key"]] = _widget_value(
+                        source_data,
+                        field["key"],
+                        default_path_builder(field),
+                    )
+                    continue
+
+                pair = _render_field(
+                    field,
+                    values_so_far,
+                    source_data,
+                    f"{key_prefix}__col_{column_index}",
                     gen,
                     default_path_builder(field),
                 )
@@ -211,70 +312,106 @@ def _render_player_list(section_def, config, gen):
     return output
 
 
-def _render_slide_list(config, gen):
-    output = {}
+def _render_slide_list(section_def, config, gen):
+    output = {"slides": {}}
     slides_out = []
-    slides_source = config.get("slides", [])
+    slides_source = config.get("slides", {}).get("content", [])
+    first_group = True
 
-    add_col, hint_col = st.columns([1, 5])
-    with add_col:
-        if st.button("➕ Add slide", key=f"g{gen}__add_slide_top", type="secondary"):
-            _stage_slides(slides_source + [_new_slide()])
-    with hint_col:
-        st.caption("Use ↑ and ↓ to reorder slides.")
+    # Optional settings groups that belong to the Slides tab, such as slide
+    # buttons, slide shortcuts, and slide sounds.
+    for field in section_def.get("fields", []):
+        if field["type"] != "group":
+            continue
 
-    if not slides_source:
-        st.info("No slides yet. Add one to get started.")
+        if not first_group:
+            st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
+        first_group = False
 
-    for index, slide_text in enumerate(slides_source):
-        row = st.columns([1, 6, 0.75, 0.75, 1.4])
+        with st.container(border=True):
+            st.markdown(field["group_label"])
 
-        with row[0]:
-            st.write(" ")
-            st.markdown(f"**Slide {index + 1}**")
+            if field.get("description"):
+                st.caption(field["description"])
 
-        with row[1]:
-            current_slide_text = st.text_input(
-                "Slide text",
-                value=slide_text,
-                key=f"g{gen}__slide_{index}__text",
-                label_visibility="collapsed",
+            group_key = field["group_key"]
+            group_source = config.get("slides", {}).get(group_key, {})
+
+            output["slides"][group_key] = _render_field_grid(
+                field["fields"],
+                {},
+                group_source,
+                f"slides__{group_key}",
+                gen,
+                lambda sub_field, group_key=group_key: ["slides", group_key, sub_field["key"]],
+                max_columns=3,
             )
 
-        staged_slides = slides_out + [current_slide_text] + slides_source[index + 1 :]
+    if section_def.get("fields"):
+        st.markdown("<div style='height:1.5rem'></div>", unsafe_allow_html=True)
 
-        with row[2]:
-            if st.button(
-                "↑",
-                key=f"g{gen}__move_slide_up_{index}",
-                type="secondary",
-                disabled=index == 0,
-                help="Move slide up",
-            ):
-                _stage_slides(_move_item(staged_slides, index, -1))
+    with st.container(border=True):
+        st.markdown("### Slide content")
 
-        with row[3]:
-            if st.button(
-                "↓",
-                key=f"g{gen}__move_slide_down_{index}",
-                type="secondary",
-                disabled=index == len(slides_source) - 1,
-                help="Move slide down",
-            ):
-                _stage_slides(_move_item(staged_slides, index, 1))
+        add_col, hint_col = st.columns([1, 5])
+        with add_col:
+            if st.button("➕ Add slide", key=f"g{gen}__add_slide_top", type="secondary"):
+                _stage_slides(slides_source + [_new_slide()])
+        with hint_col:
+            st.caption("Use ↑ and ↓ to reorder slides.")
 
-        with row[4]:
-            if st.button(
-                "🗑️ Remove",
-                key=f"g{gen}__remove_slide_{index}",
-                type="primary",
-                help="Remove this slide",
-            ):
-                _stage_slides([slide for idx, slide in enumerate(staged_slides) if idx != index])
+        if not slides_source:
+            st.info("No slides yet. Add one to get started.")
 
-        slides_out.append(current_slide_text)
+        for index, slide_text in enumerate(slides_source):
+            row = st.columns([1, 6, 0.75, 0.75, 1.4])
 
-    output["slides"] = slides_out
+            with row[0]:
+                st.write(" ")
+                st.markdown(f"**Slide {index + 1}**")
+
+            with row[1]:
+                current_slide_text = st.text_input(
+                    "Slide text",
+                    value=slide_text,
+                    key=f"g{gen}__slide_{index}__text",
+                    label_visibility="collapsed",
+                )
+
+            staged_slides = slides_out + [current_slide_text] + slides_source[index + 1 :]
+
+            with row[2]:
+                if st.button(
+                    "↑",
+                    key=f"g{gen}__move_slide_up_{index}",
+                    type="secondary",
+                    disabled=index == 0,
+                    help="Move slide up",
+                ):
+                    _stage_slides(_move_item(staged_slides, index, -1))
+
+            with row[3]:
+                if st.button(
+                    "↓",
+                    key=f"g{gen}__move_slide_down_{index}",
+                    type="secondary",
+                    disabled=index == len(slides_source) - 1,
+                    help="Move slide down",
+                ):
+                    _stage_slides(_move_item(staged_slides, index, 1))
+
+            with row[4]:
+                if st.button(
+                    "🗑️ Remove",
+                    key=f"g{gen}__remove_slide_{index}",
+                    type="primary",
+                    help="Remove this slide",
+                ):
+                    _stage_slides([slide for idx, slide in enumerate(staged_slides) if idx != index])
+
+            slides_out.append(current_slide_text)
+
+    output["slides"]["content"] = slides_out
     return output
 
 
@@ -289,8 +426,23 @@ def _render_regular_section(section_def, config, gen):
 
     for field in section_def["fields"]:
         if field["type"] == "group":
+            group_key = field["group_key"]
+            group_source = source.get(group_key, {}) if groups_nested else config.get(group_key, {})
+
             condition = field.get("condition")
             if condition and not condition(section_values):
+                # Preserve only the fields owned by hidden conditional groups so
+                # applying the form does not reset them to defaults or overwrite
+                # sibling settings edited in another tab.
+                groups_out[group_key] = _preserve_group_values(
+                    field,
+                    group_source,
+                    lambda sub_field, group_key=group_key: (
+                        [group_key, sub_field["key"]]
+                        if not groups_nested
+                        else [section_key, group_key, sub_field["key"]]
+                    ),
+                )
                 continue
 
             # Add breathing room between grouped setting cards inside tabs
@@ -305,26 +457,34 @@ def _render_regular_section(section_def, config, gen):
                 if field.get("description"):
                     st.caption(field["description"])
 
-                group_key = field["group_key"]
-
                 # If groups_nested is False, this section is only a visual UI
                 # grouping. The actual config group lives at the root, e.g.
                 # config["buttons"] instead of config["controls"]["buttons"].
-                group_source = source.get(group_key, {}) if groups_nested else config.get(group_key, {})
-
-                group_values = _render_field_grid(
-                    field["fields"],
-                    {},
-                    group_source,
-                    f"{section_key}__{group_key}",
-                    gen,
-                    lambda sub_field, group_key=group_key: (
-                        [group_key, sub_field["key"]]
-                        if not groups_nested
-                        else [section_key, group_key, sub_field["key"]]
-                    ),
-                    max_columns=3,
+                default_path_builder = lambda sub_field, group_key=group_key: (
+                    [group_key, sub_field["key"]]
+                    if not groups_nested
+                    else [section_key, group_key, sub_field["key"]]
                 )
+
+                if field.get("layout") == "columns":
+                    group_values = _render_field_columns(
+                        field["columns"],
+                        {},
+                        group_source,
+                        f"{section_key}__{group_key}",
+                        gen,
+                        default_path_builder,
+                    )
+                else:
+                    group_values = _render_field_grid(
+                        field["fields"],
+                        {},
+                        group_source,
+                        f"{section_key}__{group_key}",
+                        gen,
+                        default_path_builder,
+                        max_columns=3,
+                    )
 
                 groups_out[group_key] = group_values
 
@@ -357,7 +517,7 @@ def _render_schema_section(section_def, config, gen):
         return _render_player_list(section_def, config, gen)
 
     if section_type == "slide_list":
-        return _render_slide_list(config, gen)
+        return _render_slide_list(section_def, config, gen)
 
     return _render_regular_section(section_def, config, gen)
 
@@ -372,7 +532,10 @@ def render_schema_ui(schema, config, gen):
 
     for tab, section_def in zip(tabs, schema):
         with tab:
-            output.update(_render_schema_section(section_def, config, gen))
+            output = _deep_merge_output(
+                output,
+                _render_schema_section(section_def, config, gen),
+            )
 
     return output
 

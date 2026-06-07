@@ -9,38 +9,49 @@ from assets import CONFIG_FILE_PATH, GAIN_POINT_SOUND_PATH, LOSE_POINT_SOUND_PAT
 # ==================================================
 # This is the single source of default values for the game and settings editor.
 CONFIG_DEFAULTS = {
-    "slides": [
-        "FIRST PROMPT",
-        "NEXT SLIDE IS EMPTY",
-        "",
-        "A VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY BIG PROMPT",
-        "DON'T SWEAR",
-        "END OF GAME",
-    ],
     "players": [
         {"name": "VIC", "starting_score": 50, "starting_slide": 1, "can_win": True},
         {"name": "JACOB", "starting_score": 50, "starting_slide": 1, "can_win": True},
         {"name": "LOU", "starting_score": 50, "starting_slide": 1, "can_win": True},
         {"name": "SWEAR JAR", "starting_score": 0, "starting_slide": 5, "can_win": False},
     ],
-    "sounds": {
-        "slide": True,
-        "gain_points": True,
-        "gain_points_delay_seconds": 0.5,
-        "lose_points": True,
-        "lose_points_delay_seconds": 0.5,
+    "slides": {
+        "content": [
+            "FIRST PROMPT",
+            "NEXT SLIDE IS EMPTY",
+            "",
+            "A VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY BIG PROMPT",
+            "DON'T SWEAR",
+            "END OF GAME",
+        ],
+        "buttons": {
+            "slide": True,
+            "settings": True,
+        },
+        "shortcuts": {
+            "slide_next": "ArrowRight",
+            "slide_previous": "ArrowLeft",
+            "settings": "s",
+        },
+        "sounds": {
+            "slide": True,
+        },
     },
-    "buttons": {
-        "slide": True,
-        "points": True,
-        "settings": True,
-    },
-    "shortcuts": {
-        "slide_next": "ArrowRight",
-        "slide_previous": "ArrowLeft",
-        "settings": "s",
-        "points_modifier": "Shift",
-        "points_inverted": False,
+    "scoreboard": {
+        "enabled": True,
+        "buttons": {
+            "points": True,
+        },
+        "shortcuts": {
+            "points_modifier": "Shift",
+            "points_inverted": False,
+        },
+        "sounds": {
+            "gain_points": True,
+            "gain_points_delay_seconds": 0.5,
+            "lose_points": True,
+            "lose_points_delay_seconds": 0.5,
+        },
     },
     "winner": {
         "enabled": True,
@@ -55,7 +66,6 @@ CONFIG_DEFAULTS = {
         },
     },
 }
-
 
 def deep_merge(base, override):
     """Recursively merge *override* into a copy of *base*."""
@@ -79,9 +89,6 @@ def load_config(source=None):
       - dict          → merge an already-parsed imported/exported config
       - str / bytes   → parse imported/exported JSON text and merge it
 
-    This function does not read config.json by itself. Use load_startup_config()
-    when booting the app so local users can override defaults with a root
-    config.json file.
     """
     if source is None:
         raw = {}
@@ -128,16 +135,37 @@ def apply_config(config, text_slide_offset=0):
     ss = st.session_state
 
     ss.config = config
-    ss.slides = list(config["slides"])
+    ss.slides = list(config["slides"]["content"])
     ss.players = load_players(config)
 
-    # Sounds
-    sounds = config["sounds"]
-    ss.slide_sound_enabled = sounds["slide"]
-    ss.gain_points_sound_enabled = sounds["gain_points"]
-    ss.gain_points_sound_delay_seconds = sounds["gain_points_delay_seconds"]
-    ss.lose_points_sound_enabled = sounds["lose_points"]
-    ss.lose_points_sound_delay_seconds = sounds["lose_points_delay_seconds"]
+    # Slide settings
+    slide_settings = config["slides"]
+    slide_buttons = slide_settings["buttons"]
+    slide_shortcuts = slide_settings["shortcuts"]
+    slide_sounds = slide_settings["sounds"]
+
+    ss.slide_buttons_css_type = "secondary" if slide_buttons["slide"] else "tertiary"
+    ss.settings_button_css_type = "secondary" if slide_buttons["settings"] else "tertiary"
+    ss.slide_next_shortcut = slide_shortcuts["slide_next"]
+    ss.slide_previous_shortcut = slide_shortcuts["slide_previous"]
+    ss.settings_shortcut = slide_shortcuts["settings"]
+    ss.slide_sound_enabled = slide_sounds["slide"]
+
+    # Scoreboard settings
+    scoreboard = config["scoreboard"]
+    scoreboard_buttons = scoreboard["buttons"]
+    scoreboard_shortcuts = scoreboard["shortcuts"]
+    scoreboard_sounds = scoreboard["sounds"]
+
+    ss.scoreboard_enabled = scoreboard["enabled"]
+    ss.points_buttons_css_type = "secondary" if scoreboard_buttons["points"] else "tertiary"
+    ss.points_modifier_shortcut = scoreboard_shortcuts["points_modifier"]
+    ss.points_inverted_shortcut = scoreboard_shortcuts["points_inverted"]
+
+    ss.gain_points_sound_enabled = scoreboard_sounds["gain_points"]
+    ss.gain_points_sound_delay_seconds = scoreboard_sounds["gain_points_delay_seconds"]
+    ss.lose_points_sound_enabled = scoreboard_sounds["lose_points"]
+    ss.lose_points_sound_delay_seconds = scoreboard_sounds["lose_points_delay_seconds"]
 
     # Do not keep delayed audio queued when that sound is disabled.
     if not ss.gain_points_sound_enabled:
@@ -151,20 +179,6 @@ def apply_config(config, text_slide_offset=0):
         ss.gain_points_sound_bytes = read_asset_bytes(GAIN_POINT_SOUND_PATH)
     if ss.lose_points_sound_enabled:
         ss.lose_points_sound_bytes = read_asset_bytes(LOSE_POINT_SOUND_PATH)
-
-    # Buttons
-    buttons = config["buttons"]
-    ss.slide_buttons_css_type = "secondary" if buttons["slide"] else "tertiary"
-    ss.points_buttons_css_type = "secondary" if buttons["points"] else "tertiary"
-    ss.settings_button_css_type = "secondary" if buttons["settings"] else "tertiary"
-
-    # Shortcuts
-    shortcuts = config["shortcuts"]
-    ss.slide_next_shortcut = shortcuts["slide_next"]
-    ss.slide_previous_shortcut = shortcuts["slide_previous"]
-    ss.settings_shortcut = shortcuts["settings"]
-    ss.points_modifier_shortcut = shortcuts["points_modifier"]
-    ss.points_inverted_shortcut = shortcuts["points_inverted"]
 
     # Winner
     winner = config["winner"]

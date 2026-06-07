@@ -17,51 +17,85 @@ CONFIG_SCHEMA = [
         "section": "slides",
         "label": "Slides",
         "type": "slide_list",
-    },
-    {
-        "section": "sounds",
-        "label": "Sounds",
-        "type": "section",
-        "fields": [
-            {"type": "checkbox", "label": "Slide sound", "key": "slide"},
-            {"type": "checkbox", "label": "Gain points sound", "key": "gain_points"},
-            {
-                "type": "number",
-                "label": "Gain sound delay (seconds)",
-                "key": "gain_points_delay_seconds",
-                "step": 0.1,
-                "condition": lambda values: values.get("gain_points", True),
-            },
-            {"type": "checkbox", "label": "Lose points sound", "key": "lose_points"},
-            {
-                "type": "number",
-                "label": "Lose sound delay (seconds)",
-                "key": "lose_points_delay_seconds",
-                "step": 0.1,
-                "condition": lambda values: values.get("lose_points", True),
-            },
-        ],
-    },
-    {
-        "section": "controls",
-        "label": "Controls",
-        "type": "section",
-        "groups_nested": False,
         "fields": [
             {
                 "type": "group",
-                "group_label": "### Buttons",
+                "group_label": "### Slide buttons",
                 "group_key": "buttons",
                 "fields": [
                     {"type": "checkbox", "label": "Slide buttons", "key": "slide"},
-                    {"type": "checkbox", "label": "Points buttons", "key": "points"},
                     {"type": "checkbox", "label": "Settings button", "key": "settings"},
                 ],
             },
             {
                 "type": "group",
-                "group_label": "### Shortcuts",
+                "group_label": "### Slide shortcuts",
                 "group_key": "shortcuts",
+                "fields": [
+                    {"type": "text", "label": "Next slide key", "key": "slide_next"},
+                    {"type": "text", "label": "Previous slide key", "key": "slide_previous"},
+                    {"type": "text", "label": "Open settings key", "key": "settings"},
+                ],
+            },
+            {
+                "type": "group",
+                "group_label": "### Slide sounds",
+                "group_key": "sounds",
+                "fields": [
+                    {"type": "checkbox", "label": "Slide sound", "key": "slide"},
+                ],
+            },
+        ],
+    },
+    {
+        "section": "scoreboard",
+        "label": "Scoreboard",
+        "type": "section",
+        "fields": [
+            {"type": "checkbox", "label": "Show scoreboard", "key": "enabled"},
+            {
+                "type": "group",
+                "group_label": "### Scoreboard buttons",
+                "group_key": "buttons",
+                "condition": lambda values: values.get("enabled", False),
+                "fields": [
+                    {"type": "checkbox", "label": "Points buttons", "key": "points"},
+                ],
+            },
+            {
+                "type": "group",
+                "group_label": "### Scoreboard sounds",
+                "group_key": "sounds",
+                "condition": lambda values: values.get("enabled", False),
+                "layout": "columns",
+                "columns": [
+                    [
+                        {"type": "checkbox", "label": "Gain points sound", "key": "gain_points"},
+                        {
+                            "type": "number",
+                            "label": "Gain sound delay (seconds)",
+                            "key": "gain_points_delay_seconds",
+                            "step": 0.1,
+                            "condition": lambda values: values.get("gain_points", True),
+                        },
+                    ],
+                    [
+                        {"type": "checkbox", "label": "Lose points sound", "key": "lose_points"},
+                        {
+                            "type": "number",
+                            "label": "Lose sound delay (seconds)",
+                            "key": "lose_points_delay_seconds",
+                            "step": 0.1,
+                            "condition": lambda values: values.get("lose_points", True),
+                        },
+                    ],
+                ],
+            },
+            {
+                "type": "group",
+                "group_label": "### Scoreboard shortcuts",
+                "group_key": "shortcuts",
+                "condition": lambda values: values.get("enabled", False),
                 "description": (
                     "Point shortcuts are assigned by player order. Press a number key "
                     "such as 1, 2, 3, and so on to add one point to that player. "
@@ -71,9 +105,6 @@ CONFIG_SCHEMA = [
                     "number key remove points and modifier+number add points instead."
                 ),
                 "fields": [
-                    {"type": "text", "label": "Next slide key", "key": "slide_next"},
-                    {"type": "text", "label": "Previous slide key", "key": "slide_previous"},
-                    {"type": "text", "label": "Open settings key", "key": "settings"},
                     {"type": "text", "label": "Points Modifier key", "key": "points_modifier"},
                     {"type": "checkbox", "label": "Invert point shortcuts", "key": "points_inverted"},
                 ],
