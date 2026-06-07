@@ -9,6 +9,7 @@ A template to create slides with simple prompts and a fixed scoreboard that allo
 - Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
 - On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
 - Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to import all settings next time you visit the page
+- The overall structure works on mobile and other devices, but it's not completely responsive, so you might see a few bugs. I recommend using a large monitor or TV to properly display everything
 
 ## Installation
 
@@ -18,7 +19,7 @@ A template to create slides with simple prompts and a fixed scoreboard that allo
 ## How to use
 
 - Run `streamlit run app.py`
-- Access localhost:http://localhost:8501/ if it didn't open up automatically
+- Access localhost: http://localhost:8501/ if it didn't open up automatically
 - Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
 - On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
 - Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to automatically import all settings
