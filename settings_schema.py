@@ -33,7 +33,8 @@ CONFIG_SCHEMA = [
                 "group_key": "shortcuts",
                 "description": (
                     "The keys \"C\" and \"R\" are reserved and can't be used, even with modifiers. "
-                    "Punctuation keys like \".\" and \",\" aren't currently supported."
+                    "Punctuation keys like \".\" and \",\" aren't currently supported. "
+                    "[Documentation](https://docs.streamlit.io/develop/api-reference/widgets/st.button) (parameter `shortcut`)."
                 ),
                 "fields": [
                     {"type": "text", "label": "Previous slide key", "key": "slide_previous"},
@@ -105,7 +106,8 @@ CONFIG_SCHEMA = [
                     "such as 1, 2, 3, and so on to add one point to that player. "
                     "Press Shift+number, such as Shift+1 or Shift+2, to remove one point.  \n"
                     "Change the Points Modifier key to use a modifier other than Shift. "
-                    "Allowed modifiers: Alt, Ctrl, Cmd, Meta, Mod, Option, Shift.  \n"
+                    "Allowed modifiers: Alt, Ctrl, Cmd, Meta, Mod, Option, Shift. "
+                    "[Documentation](https://docs.streamlit.io/develop/api-reference/widgets/st.button) (parameter `shortcut`).  \n"
                     "Enable Invert point shortcuts to reverse that behavior, making the "
                     "number key remove points and modifier+number add points instead."
                 ),

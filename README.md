@@ -12,7 +12,8 @@ A template to create slides with simple prompts and a fixed scoreboard that allo
 
 ## Installation
 
-Uses Python and Streamlit: https://docs.streamlit.io/get-started/installation
+- Uses Python and Streamlit: https://docs.streamlit.io/get-started/installation
+  - _Built and tested with Python 3.13.5 and Streamlit 1.58.0_
 
 ## How to use
 
@@ -27,5 +28,7 @@ Uses Python and Streamlit: https://docs.streamlit.io/get-started/installation
 
 ## Credits
 
-- Cover, prompt font and slide change sound: Alex on [Reddit](https://www.reddit.com/r/GameChangerTV/comments/1feccfu/here_it_is_a_game_changer_powerpoint_template/), files on [Google Drive](https://drive.google.com/drive/folders/1fzeI7gSl5iFhhU4Wv3XM1ihaxa9uAhbB)
+- Cover, prompt font and slide change sound: juxtapositionally on [Reddit](https://www.reddit.com/r/GameChangerTV/comments/1feccfu/here_it_is_a_game_changer_powerpoint_template/), files on [Google Drive](https://drive.google.com/drive/folders/1fzeI7gSl5iFhhU4Wv3XM1ihaxa9uAhbB)
 - 7-segment display font (DSEG7): [keshikan.net](https://www.keshikan.net/fonts-e.html) and [GitHub](https://github.com/keshikan/DSEG)
+- Gain point sound: floraphonic on [pixabay](https://pixabay.com/sound-effects/film-special-effects-copper-bell-ding-25-204990/)
+- Lose point sound: eritnhut1992 on [pixabay](https://pixabay.com/sound-effects/film-special-effects-buzzer-or-wrong-answer-20582/)
