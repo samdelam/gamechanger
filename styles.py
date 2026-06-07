@@ -4,7 +4,7 @@ from assets import DSEG7_FONT_PATH, TRADE_GOTHIC_FONT_PATH, load_font
 
 
 SCOREBOARD_HEIGHT = "23vh"
-SLIDES_MARGIN = "1rem"
+SLIDES_MARGIN = "2vmin"
 
 
 def inject_font_css():
@@ -68,7 +68,7 @@ def inject_app_css(scoreboard_enabled=True):
             box-sizing: border-box;
             min-height: {slides_height};
             max-height: {slides_height};
-            padding: 2rem;
+            padding: 4vmin;
             display: flex !important;
             flex-direction: column;
             justify-content: center !important;
@@ -77,7 +77,7 @@ def inject_app_css(scoreboard_enabled=True):
             width: calc(100% - ({SLIDES_MARGIN} * 2));
             position: relative;
             background: #dcdcdc;
-            border-radius: 5rem;
+            border-radius: 10vmin;
             margin: {SLIDES_MARGIN};
             box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
             color: #111111;
@@ -130,16 +130,22 @@ def inject_app_css(scoreboard_enabled=True):
             bottom: 0; left: 0;
             width: 100%;
             background: black;
-            padding: 10px 150px;
+            padding: 1vmin 10vw;
             z-index: 999;
             height: {SCOREBOARD_HEIGHT};
 
             .stElementContainer {{ text-align: center; }}
-            h2 {{ font-size: 3rem !important; }}
+            h2 {{
+                font-size: 4.5vmin !important;
+                padding: 1vmin 0;
+            }}
             button[kind="secondary"] {{
-                margin-top: 20px;
-                width: 33px !important;
-                min-width: 33px !important;
+                margin-top: 2vmin;
+                width: 4vmin !important;
+                min-width: 4vmin !important;
+                height: 4vmin !important;
+                min-height: 4vmin !important;
+                padding: 0;
             }}
         }}
 
@@ -151,7 +157,7 @@ def inject_app_css(scoreboard_enabled=True):
             font-family: 'DSEG7', monospace !important;
             color: #ff2a2a !important;
             text-shadow: 0 0 5px #ff2a2a, 0 0 10px #ff2a2a, 0 0 20px #ff2a2a;
-            font-size: 3rem !important;
+            font-size: 5.2vmin !important;
             font-weight: normal !important;
         }}
 

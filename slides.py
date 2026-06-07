@@ -36,9 +36,9 @@ def _render_winner_slide():
 
     st.markdown(
         f"""
-        <div style="text-align:center;font-size:6rem;font-weight:600">{title}</div>
-        <div style="text-align:center;font-size:8rem;font-weight:800">{text}</div>
-        <div style="text-align:center;font-size:6rem;font-weight:600">{score}</div>
+        <div style="text-align:center;font-size:8vmin;font-weight:600">{title}</div>
+        <div style="text-align:center;font-size:12vmin;font-weight:800">{text}</div>
+        <div style="text-align:center;font-size:8vmin;font-weight:600">{score}</div>
         """,
         unsafe_allow_html=True,
     )
@@ -46,16 +46,16 @@ def _render_winner_slide():
 
 def _render_text_slide(current_slide):
     font_size = (
-        max(2.5, min(10, 70 / (len(current_slide) ** 0.5)))
+        max(4.5, min(15, 70 / (len(current_slide) ** 0.5)))
         if current_slide
-        else 10
+        else 15
     )
 
     st.markdown(
         f"""
         <div style="
             text-align:center;
-            font-size:{font_size}rem;
+            font-size:{font_size}vmin;
             font-weight:600;
             line-height:1.4;
         ">{current_slide}</div>
