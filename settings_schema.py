@@ -62,6 +62,14 @@ CONFIG_SCHEMA = [
                 "type": "group",
                 "group_label": "### Shortcuts",
                 "group_key": "shortcuts",
+                "description": (
+                    "Point shortcuts are assigned by player order. Press a number key "
+                    "such as 1, 2, 3, and so on to add one point to that player. "
+                    "Press Shift+number, such as Shift+1 or Shift+2, to remove one point. "
+                    "Change the Points Modifier key to use a modifier other than Shift. "
+                    "Enable Invert point shortcuts to reverse that behavior, making the "
+                    "number key remove points and modifier+number add points instead."
+                ),
                 "fields": [
                     {"type": "text", "label": "Next slide key", "key": "slide_next"},
                     {"type": "text", "label": "Previous slide key", "key": "slide_previous"},

@@ -301,6 +301,10 @@ def _render_regular_section(section_def, config, gen):
 
             with st.container(border=True):
                 st.markdown(field["group_label"])
+
+                if field.get("description"):
+                    st.caption(field["description"])
+
                 group_key = field["group_key"]
 
                 # If groups_nested is False, this section is only a visual UI
