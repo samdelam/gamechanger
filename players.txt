@@ -1,3 +1,0 @@
-Player 1;50
-Player 2;50
-Player 3;50

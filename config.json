@@ -1,0 +1,61 @@
+{
+    "players": [
+        {
+            "name": "VIC",
+            "starting_score": 50,
+            "starting_slide": 1,
+            "can_win": true
+        },
+        {
+            "name": "JACOB",
+            "starting_score": 50,
+            "starting_slide": 1,
+            "can_win": true
+        },
+        {
+            "name": "LOU",
+            "starting_score": 50,
+            "starting_slide": 1,
+            "can_win": true
+        },
+        {
+            "name": "SWEAR JAR",
+            "starting_score": 0,
+            "starting_slide": 6,
+            "can_win": false
+        }
+    ],
+
+    "sounds": {
+        "slide": true,
+        "gain_points": true,
+        "gain_points_delay_seconds": 0.5,
+        "lose_points": true,
+        "lose_points_delay_seconds": 0.5
+    },
+
+    "buttons": {
+        "slide": false,
+        "points": false
+    },
+
+    "shortcuts": {
+        "slide_next": "ArrowRight",
+        "slide_previous": "ArrowLeft",
+        "points_modifier": "Shift",
+        "points_inverted": false
+    },
+
+    "winner": {
+        "enabled": true,
+        "single": {
+            "title": "AND THE WINNER IS:",
+            "score_text": "WITH {score} POINTS"
+        },
+        "multiple": {
+            "title": "AND THE WINNERS ARE:",
+            "separator": "AND",
+            "score_text": "WITH {score} POINTS"
+        }
+    }
+}
