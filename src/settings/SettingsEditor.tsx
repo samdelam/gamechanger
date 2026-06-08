@@ -126,11 +126,18 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
             <p>Change the game, then apply the settings to return to the presentation.</p>
           </div>
           <div className="settings-import">
-            <input
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => importConfig(event.currentTarget.files?.[0] ?? null)}
-            />
+            <label className="secondary-button settings-upload-button">
+              ⬆ Upload config.json
+              <input
+                className="settings-hidden-file-input"
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => {
+                  importConfig(event.currentTarget.files?.[0] ?? null)
+                  event.currentTarget.value = ''
+                }}
+              />
+            </label>
             {importError && <span className="settings-error">{importError}</span>}
           </div>
         </header>
@@ -151,25 +158,63 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
         <div className="settings-tab-panel">
           {activeTab === 'Players' && (
             <div>
-              <div className="settings-top-row">
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => updateDraft((current) => {
-                    current.players.push(newPlayer(current.players.length + 1, firstPlayer))
-                    return current
-                  })}
-                >
-                  ➕ Add player
-                </button>
-                <span className="settings-hint">Use ↑ and ↓ to reorder players.</span>
-              </div>
+              <Group title="Players" description="Use ↑ and ↓ to reorder players.">
+                {draft.players.length === 0 && <p className="settings-empty">No players yet. Add one to get started.</p>}
 
-              {draft.players.length === 0 && <p className="settings-empty">No players yet. Add one to get started.</p>}
-
-              {draft.players.map((player, index) => (
-                <details className="settings-expander" key={index}>
-                  <summary>Player {index + 1}: {player.name || `Player ${index + 1}`}</summary>
+                {draft.players.map((player, index) => (
+                  <details className="settings-expander" key={index}>
+                  <summary className="settings-expander-summary">
+                    <span>Player {index + 1}: {player.name || `Player ${index + 1}`}</span>
+                    <span className="summary-actions">
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        disabled={index === 0}
+                        title="Move player up"
+                        onClick={(event) => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          updateDraft((current) => {
+                            current.players = moveItem(current.players, index, -1)
+                            return current
+                          })
+                        }}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        disabled={index === draft.players.length - 1}
+                        title="Move player down"
+                        onClick={(event) => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          updateDraft((current) => {
+                            current.players = moveItem(current.players, index, 1)
+                            return current
+                          })
+                        }}
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        className="danger-button"
+                        title="Remove player"
+                        onClick={(event) => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          updateDraft((current) => {
+                            current.players.splice(index, 1)
+                            return current
+                          })
+                        }}
+                      >
+                        🗑️ Remove
+                      </button>
+                    </span>
+                  </summary>
                   <div className="player-grid">
                     <Field label="Name">
                       <input
@@ -210,23 +255,23 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
                         })}
                       />
                     </Field>
-                    <div className="row-actions">
-                      <button type="button" className="secondary-button" disabled={index === 0} onClick={() => updateDraft((current) => {
-                        current.players = moveItem(current.players, index, -1)
-                        return current
-                      })}>↑</button>
-                      <button type="button" className="secondary-button" disabled={index === draft.players.length - 1} onClick={() => updateDraft((current) => {
-                        current.players = moveItem(current.players, index, 1)
-                        return current
-                      })}>↓</button>
-                      <button type="button" className="danger-button" onClick={() => updateDraft((current) => {
-                        current.players.splice(index, 1)
-                        return current
-                      })}>🗑️ Remove</button>
-                    </div>
                   </div>
-                </details>
-              ))}
+                  </details>
+                ))}
+
+                <div className="settings-list-footer">
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => updateDraft((current) => {
+                      current.players.push(newPlayer(current.players.length + 1, firstPlayer))
+                      return current
+                    })}
+                  >
+                    ➕ Add player
+                  </button>
+                </div>
+              </Group>
             </div>
           )}
 
@@ -283,10 +328,6 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
 
               <Group title="Slide content">
                 <div className="settings-top-row">
-                  <button type="button" className="secondary-button" onClick={() => updateDraft((current) => {
-                    current.slides.content.push('')
-                    return current
-                  })}>➕ Add slide</button>
                   <span className="settings-hint">Empty slides are allowed. Use ↑ and ↓ to reorder slides.</span>
                 </div>
 
@@ -315,6 +356,13 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
                     })}>🗑️ Remove</button>
                   </div>
                 ))}
+
+                <div className="settings-list-footer">
+                  <button type="button" className="secondary-button" onClick={() => updateDraft((current) => {
+                    current.slides.content.push('')
+                    return current
+                  })}>➕ Add slide</button>
+                </div>
               </Group>
             </div>
           )}

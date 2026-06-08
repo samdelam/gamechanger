@@ -306,6 +306,17 @@ button:disabled {
   align-items: flex-end;
 }
 
+.settings-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.settings-hidden-file-input {
+  display: none;
+}
+
 .settings-error {
   color: #ff8a8a;
 }
@@ -416,6 +427,39 @@ select:focus {
   cursor: pointer;
   padding: 0.85rem 1rem;
   color: #f6f6f6;
+}
+
+.settings-expander-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-expander-summary > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: end;
+  min-width: max-content;
+}
+
+.summary-actions button {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-list-footer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
 }
 
 .settings-expander > div {
@@ -537,5 +581,13 @@ select:focus {
 
   .row-actions {
     align-items: center;
+  }
+
+  .settings-expander-summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .summary-actions {
+    flex-wrap: nowrap;
   }
 }
