@@ -2,7 +2,18 @@
 
 A template to create slides with simple prompts and a fixed scoreboard that allows players to keep track of their points
 
-## Requirements
+## Public page
+
+You can access it for free here on [GitHub pages](https://feliperenault.github.io/gamechanger/), without installing anything!
+
+## Configuration
+
+- Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
+- On the cover, you'll see a `⚙️` button. Click there (or press `S`) to edit the game and `Apply` the changes when you're done
+- Your changes should be saved on your browser, however, if making lots of changes, such as creating players and prompts, make sure to export a backup file as explained below
+- You can click `Download config.json` to export your settings file. That file can later be imported with the button on the top right of the settings page to automatically import all settings, players, prompts and cover image
+
+## Installing
 
 - [Node.js](https://nodejs.org/en/download)
 - npm (installed with node)
@@ -17,13 +28,8 @@ npm run dev
 
 Open the local URL shown by Vite, usually `http://localhost:5173/`.
 
-## Configuration
+## Local settings
 
-- Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
-- On the cover, you'll see a `⚙️` button. Click there (or press `S`) to edit the game and `Apply` the changes when you're done
-- Settings are saved on your local storage on your browser
-- Alternatively, you can `Download config.json` file. That file can later be imported with the button on the top right of the settings page to automatically import all settings
-  - _When making lots of changes, such as creating players and prompts, make sure to export this file as a backup_
 - Leaving the exported `config.json` file on the `public` folder will automatically import the settings when running the code, however, local storage still has a higher priority
 - To change the audios played, you can overwrite the files in `public/assets/sounds`
 
