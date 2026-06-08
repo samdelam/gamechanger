@@ -33,6 +33,10 @@ Open the local URL shown by Vite, usually `http://localhost:5173/`.
 - Leaving the exported `config.json` file on the `public` folder will automatically import the settings when running the code, however, local storage still has a higher priority
 - To change the audios played, you can overwrite the files in `public/assets/sounds`
 
+## Contributing
+
+Good luck. The original project was made in Python with Streamlit. It's still available on the [streamlit](https://github.com/FelipeRenault/gamechanger/tree/streamlit) branch. There, I could grasp what was going on. However, due to latency issues when hosting the game on Streamlit's cloud, AI suggested I should migrate to a native web option. So I did, well, _it_ did. Now I don't have much knowledge of what's going on anymore, since I'm not a frontend dev, but I'm glad it's working. If you want to contribute to the project, feel free. I'll likely have a superficial look into it and approve if it's a nice feature and works fine :)
+
 ## Credits
 
 - Cover, prompt font and slide change sound: juxtapositionally on [Reddit](https://www.reddit.com/r/GameChangerTV/comments/1feccfu/here_it_is_a_game_changer_powerpoint_template/), files on [Google Drive](https://drive.google.com/drive/folders/1fzeI7gSl5iFhhU4Wv3XM1ihaxa9uAhbB)
