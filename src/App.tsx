@@ -8,6 +8,7 @@ import { SlideView } from './game/SlideView'
 import { buildRuntimePlayers, useGameState } from './game/useGameState'
 import { SettingsEditor } from './settings/SettingsEditor'
 import { useKeyboardShortcuts } from './keyboard/useKeyboardShortcuts'
+import { useVisualViewportHeight } from './hooks/useVisualViewportHeight'
 
 function getTextSlideOffset(hasCover: boolean): number {
   return hasCover ? 1 : 0
@@ -18,6 +19,8 @@ function defaultCoverSrc(): string {
 }
 
 export function App() {
+  useVisualViewportHeight()
+
   const [config, setConfig] = useState<GameConfig>(defaultConfig)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [hasCover, setHasCover] = useState(false)
