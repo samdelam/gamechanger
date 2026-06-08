@@ -6,7 +6,6 @@ export const defaultConfig: GameConfig = {
       'FIRST PROMPT',
       'NEXT SLIDE IS EMPTY',
       '',
-      "TESTING HOW A VERY BIG PROMPT MIGHT LOOK LIKE ON THE SCREEN SO IT DOESN'T OVERFLOW TO THE SCOREBOARD",
       'A VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY BIG PROMPT',
       "DON'T SWEAR",
       'END OF GAME',
@@ -28,12 +27,12 @@ export const defaultConfig: GameConfig = {
     { name: 'VIC', startingScore: 50, startingSlide: 1, canWin: true },
     { name: 'JACOB', startingScore: 50, startingSlide: 1, canWin: true },
     { name: 'LOU', startingScore: 50, startingSlide: 1, canWin: true },
-    { name: 'SWEAR JAR', startingScore: 0, startingSlide: 6, canWin: false },
+    { name: 'SWEAR JAR', startingScore: 0, startingSlide: 5, canWin: false },
   ],
   scoreboard: {
     enabled: true,
     buttons: {
-      points: false,
+      points: true,
     },
     shortcuts: {
       pointsModifier: 'Shift',

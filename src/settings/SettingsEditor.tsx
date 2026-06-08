@@ -365,7 +365,13 @@ export function SettingsEditor({ config, onApply, onCancel, onResetDefaults }: P
                     </div>
                   </Group>
 
-                  <Group title="Scoreboard sounds">
+                  <Group
+                    title="Scoreboard sounds"
+                    description={
+                      "The delay is used so multiple addition/removal of points don't play the sound multiple times.\n"+
+                      "If the delay is 0.5s, the sound will only play after 0.5s has passed without any new addition/removal of points."
+                    }
+                  >
                     <div className="sound-columns">
                       <div>
                         <Field label="Gain points sound">
