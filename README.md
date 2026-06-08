@@ -2,30 +2,30 @@
 
 A template to create slides with simple prompts and a fixed scoreboard that allows players to keep track of their points
 
-## Web version
+## Requirements
 
-- If you don't want to install python and streamlit, you can use the [Web Version](https://gamechanger-dropout.streamlit.app/)
-  - _The web version is a little laggy, so I do recommend installing and running it locally_
+- [Node.js](https://nodejs.org/en/download)
+- npm (installed with node)
+  - _Built and tested with node v25.0.0_
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open the local URL shown by Vite, usually `http://localhost:5173/`.
+
+## Configuration
+
 - Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
-- On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
-- Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to import all settings next time you visit the page
-- The overall structure works on mobile and other devices, but it's not completely responsive, so you might see a few bugs. I recommend using a large monitor or TV to properly display everything
-
-## Installation
-
-- Uses Python and Streamlit: https://docs.streamlit.io/get-started/installation
-  - _Built and tested with Python 3.13.5 and Streamlit 1.58.0_
-
-## How to use
-
-- Run `streamlit run app.py`
-- Access localhost: http://localhost:8501/ if it didn't open up automatically
-- Make sure you allow autoplay for the webpage on your browser so the sounds play correctly
-- On the cover, you'll see a `⚙️` button. Click there to edit the game and Apply the changes when you're done
-- Alternatively, you can `Download config.json` file. That file can be imported as a config with the `Upload` button to automatically import all settings
-- Leaving the exported `config.json` file on the root folder will automatically import the settings when running the code, without the need to import manually
-- To change the cover, overwrite the `assets/media/cover` file. Formats accepted are `png`, `jpg`, `jpeg` and `webp`. You can remove the file to automatically jump to the first slide
-- To change the audios played, you can overwrite the files in `assets/sounds`
+- On the cover, you'll see a `⚙️` button. Click there (or press `S`) to edit the game and `Apply` the changes when you're done
+- Settings are saved on your local storage on your browser
+- Alternatively, you can `Download config.json` file. That file can later be imported with the button on the top right of the settings page to automatically import all settings
+  - _When making lots of changes, such as creating players and prompts, make sure to export this file as a backup_
+- Leaving the exported `config.json` file on the `public` folder will automatically import the settings when running the code, however, local storage still has a higher priority
+- To change the audios played, you can overwrite the files in `public/assets/sounds`
 
 ## Credits
 
