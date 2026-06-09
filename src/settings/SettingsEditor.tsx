@@ -866,6 +866,15 @@ export function SettingsEditor({
           </button>
         </footer>
 
+        <div className="settings-source-link">
+          <a href="https://github.com/FelipeRenault/gamechanger" target="_blank" rel="noreferrer">
+            <svg aria-hidden="true" viewBox="0 0 16 16">
+              <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.78.4.08.55-.18.55-.4l-.01-1.4c-2.23.5-2.7-1.1-2.7-1.1-.36-.95-.89-1.2-.89-1.2-.73-.51.05-.5.05-.5.81.06 1.24.85 1.24.85.72 1.26 1.88.9 2.34.69.07-.54.28-.9.51-1.11-1.78-.21-3.64-.91-3.64-4.04 0-.89.31-1.62.82-2.2-.08-.2-.36-1.03.08-2.16 0 0 .68-.22 2.2.84A7.45 7.45 0 0 1 8 3.58c.68 0 1.36.09 2 .27 1.53-1.06 2.2-.84 2.2-.84.44 1.13.16 1.96.08 2.16.51.58.82 1.31.82 2.2 0 3.14-1.87 3.83-3.65 4.03.29.26.54.76.54 1.53l-.01 2.27c0 .22.14.48.55.4A8.14 8.14 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z" />
+            </svg>
+            FelipeRenault/gamechanger
+          </a>
+        </div>
+
         {confirmation && (
           <div className="settings-confirm-backdrop" role="presentation">
             <div className="settings-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-confirm-title">

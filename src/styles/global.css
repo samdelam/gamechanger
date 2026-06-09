@@ -322,6 +322,8 @@ button:disabled {
 }
 
 .settings-editor {
+  display: flex;
+  flex-direction: column;
   max-width: 1200px;
   min-height: calc(100vh - 4rem);
   margin: 0 auto;
@@ -806,6 +808,34 @@ select:focus {
   gap: 0.75rem;
   padding-top: 1.25rem;
   border-top: 1px solid rgba(255,255,255,.14);
+}
+
+.settings-source-link {
+  margin-top: auto;
+  padding-top: 1rem;
+  margin-bottom: -1.75rem;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.settings-source-link a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  color: #a9a9a9;
+  text-decoration: none;
+}
+
+.settings-source-link svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: currentColor;
+}
+
+.settings-source-link a:hover {
+  color: #c8c8c8;
+  text-decoration: underline;
 }
 
 .settings-confirm-backdrop {
