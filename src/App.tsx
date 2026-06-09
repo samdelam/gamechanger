@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AudioManager } from './audio/audioManager'
 import { defaultConfig } from './config/defaultConfig'
-import { clearStoredConfig, loadRootConfig, loadStoredConfig, saveStoredConfig } from './config/configStorage'
+import { loadRootConfig, loadStoredConfig, saveStoredConfig } from './config/configStorage'
 import type { GameConfig } from './config/types'
 import { Scoreboard } from './game/Scoreboard'
 import { SlideView } from './game/SlideView'
@@ -113,6 +113,10 @@ export function App() {
   }, [maxSlide, setSlideIndex])
 
   useEffect(() => {
+    audioManager.current.setSoundSources(config.assets.sounds)
+  }, [config.assets.sounds])
+
+  useEffect(() => {
     if (slideIndex !== lastSlideIndex.current && config.slides.sounds.slide) {
       const winnerIndex = config.slides.content.length + textSlideOffset
       const isWinnerSlide = config.winner.enabled && slideIndex === winnerIndex
@@ -142,6 +146,8 @@ export function App() {
   }, [])
 
   const addPoint = useCallback((visiblePlayerIndex: number) => {
+    if (!config.scoreboard.enabled) return
+
     const player = visiblePlayers[visiblePlayerIndex]
     if (!player) return
     const runtimeIndex = players.indexOf(player)
@@ -151,9 +157,11 @@ export function App() {
     if (config.scoreboard.sounds.gainPoints) {
       audioManager.current.playGain(config.scoreboard.sounds.gainPointsDelaySeconds)
     }
-  }, [changeScore, config.scoreboard.sounds.gainPoints, config.scoreboard.sounds.gainPointsDelaySeconds, players, visiblePlayers])
+  }, [changeScore, config.scoreboard.enabled, config.scoreboard.sounds.gainPoints, config.scoreboard.sounds.gainPointsDelaySeconds, players, visiblePlayers])
 
   const removePoint = useCallback((visiblePlayerIndex: number) => {
+    if (!config.scoreboard.enabled) return
+
     const player = visiblePlayers[visiblePlayerIndex]
     if (!player) return
     const runtimeIndex = players.indexOf(player)
@@ -163,7 +171,7 @@ export function App() {
     if (config.scoreboard.sounds.losePoints) {
       audioManager.current.playLose(config.scoreboard.sounds.losePointsDelaySeconds)
     }
-  }, [changeScore, config.scoreboard.sounds.losePoints, config.scoreboard.sounds.losePointsDelaySeconds, players, visiblePlayers])
+  }, [changeScore, config.scoreboard.enabled, config.scoreboard.sounds.losePoints, config.scoreboard.sounds.losePointsDelaySeconds, players, visiblePlayers])
 
   useKeyboardShortcuts({
     enabled: !settingsOpen,
@@ -195,21 +203,15 @@ export function App() {
     setSettingsOpen(false)
   }
 
-  const resetLocalSettings = () => {
-    clearStoredConfig()
-    setConfig(defaultConfig)
-    resetPlayersFromConfig(defaultConfig)
-    setSlideIndex(0)
-    setSettingsOpen(false)
-  }
-
   if (settingsOpen) {
     return (
       <SettingsEditor
         config={config}
         onApply={applySettings}
         onCancel={() => setSettingsOpen(false)}
-        onResetDefaults={resetLocalSettings}
+        onPreviewSlideSound={(src) => audioManager.current.playSlide(src)}
+        onPreviewGainPointsSound={(src) => audioManager.current.playGain(0, src)}
+        onPreviewLosePointsSound={(src) => audioManager.current.playLose(0, src)}
       />
     )
   }

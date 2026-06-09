@@ -103,14 +103,20 @@ export function SlideView({
       <div className="slide-navigation">
         <div className="slide-nav-left">
           {slideIndex > 0 ? (
-            <button className={slideButtonsVisible ? 'game-button' : 'hidden-button'} onClick={onPrevious}>⬅</button>
+            <button className={slideButtonsVisible ? 'game-button' : 'hidden-button'} onClick={onPrevious}>
+              <span className="game-button-icon">←</span>
+            </button>
           ) : (
-            <button className={settingsButtonVisible ? 'game-button' : 'hidden-button'} onClick={onOpenSettings}>⚙️</button>
+            <button className={settingsButtonVisible ? 'game-button' : 'hidden-button'} onClick={onOpenSettings}>
+              <span className="game-button-icon">⚙️</span>
+            </button>
           )}
         </div>
         <div className="slide-nav-right">
           {slideIndex < maxSlide && (
-            <button className={slideButtonsVisible ? 'game-button' : 'hidden-button'} onClick={onNext}>➡</button>
+            <button className={slideButtonsVisible ? 'game-button' : 'hidden-button'} onClick={onNext}>
+              <span className="game-button-icon">→</span>
+            </button>
           )}
         </div>
       </div>

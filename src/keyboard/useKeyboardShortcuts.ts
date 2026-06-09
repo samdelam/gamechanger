@@ -88,6 +88,8 @@ export function useKeyboardShortcuts({
         return
       }
 
+      if (!config.scoreboard.enabled) return
+
       const playerNumber = playerNumberFromEvent(event)
       if (playerNumber === null || playerNumber > visiblePlayerCount) {
         return

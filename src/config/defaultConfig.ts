@@ -49,6 +49,13 @@ export const defaultConfig: GameConfig = {
     enabled: true,
     imageDataUrl: '',
   },
+  assets: {
+    sounds: {
+      slideDataUrl: '',
+      gainPointsDataUrl: '',
+      losePointsDataUrl: '',
+    },
+  },
   winner: {
     enabled: true,
     single: {

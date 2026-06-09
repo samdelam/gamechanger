@@ -1,4 +1,7 @@
 export class AudioManager {
+  private defaultSlideSrc: string
+  private defaultGainSrc: string
+  private defaultLoseSrc: string
   private slideAudio: HTMLAudioElement
   private gainAudio: HTMLAudioElement
   private loseAudio: HTMLAudioElement
@@ -7,15 +10,35 @@ export class AudioManager {
   private loseTimer: number | null = null
 
   constructor(baseUrl: string) {
-    this.slideAudio = this.createAudio(`${baseUrl}assets/sounds/slide.wav`)
-    this.gainAudio = this.createAudio(`${baseUrl}assets/sounds/gain_point.wav`)
-    this.loseAudio = this.createAudio(`${baseUrl}assets/sounds/lose_point.wav`)
+    this.defaultSlideSrc = `${baseUrl}assets/sounds/slide.wav`
+    this.defaultGainSrc = `${baseUrl}assets/sounds/gain_point.wav`
+    this.defaultLoseSrc = `${baseUrl}assets/sounds/lose_point.wav`
+    this.slideAudio = this.createAudio(this.defaultSlideSrc)
+    this.gainAudio = this.createAudio(this.defaultGainSrc)
+    this.loseAudio = this.createAudio(this.defaultLoseSrc)
   }
 
   private createAudio(src: string): HTMLAudioElement {
     const audio = new Audio(src)
     audio.preload = 'auto'
     return audio
+  }
+
+  private setAudioSource(audio: HTMLAudioElement, src: string): void {
+    if (audio.src === src) return
+    audio.pause()
+    audio.src = src
+    if (this.unlocked) audio.load()
+  }
+
+  setSoundSources(sounds: {
+    slideDataUrl?: string
+    gainPointsDataUrl?: string
+    losePointsDataUrl?: string
+  }): void {
+    this.setAudioSource(this.slideAudio, sounds.slideDataUrl || this.defaultSlideSrc)
+    this.setAudioSource(this.gainAudio, sounds.gainPointsDataUrl || this.defaultGainSrc)
+    this.setAudioSource(this.loseAudio, sounds.losePointsDataUrl || this.defaultLoseSrc)
   }
 
   unlock(): void {
@@ -65,11 +88,21 @@ export class AudioManager {
     setTimer(nextTimer)
   }
 
-  playSlide(): void {
+  playSlide(srcOverride?: string): void {
+    if (srcOverride !== undefined) {
+      this.play(this.createAudio(srcOverride || this.defaultSlideSrc))
+      return
+    }
+
     this.play(this.slideAudio)
   }
 
-  playGain(delaySeconds = 0): void {
+  playGain(delaySeconds = 0, srcOverride?: string): void {
+    if (srcOverride !== undefined) {
+      this.play(this.createAudio(srcOverride || this.defaultGainSrc))
+      return
+    }
+
     this.debouncePlay(
       this.gainAudio,
       delaySeconds,
@@ -80,7 +113,12 @@ export class AudioManager {
     )
   }
 
-  playLose(delaySeconds = 0): void {
+  playLose(delaySeconds = 0, srcOverride?: string): void {
+    if (srcOverride !== undefined) {
+      this.play(this.createAudio(srcOverride || this.defaultLoseSrc))
+      return
+    }
+
     this.debouncePlay(
       this.loseAudio,
       delaySeconds,

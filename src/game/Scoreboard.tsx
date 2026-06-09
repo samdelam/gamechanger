@@ -57,32 +57,34 @@ export function Scoreboard({
   if (visiblePlayers.length === 0) return null
 
   return (
-    <footer className="scoreboard">
+    <footer className={`scoreboard ${config.buttons.points ? 'with-score-buttons' : 'without-score-buttons'}`}>
       <div className="scoreboard-row" style={{ gridTemplateColumns: `repeat(${visiblePlayers.length}, minmax(0, 1fr))` }}>
         {visiblePlayers.map((player, index) => (
           <div className="scoreboard-player" key={`${player.name}-${index}`}>
             <h2>{player.name}</h2>
             <div className="score-value">{player.score}</div>
-            <div className="score-buttons">
-              <button
-                type="button"
-                className={config.buttons.points ? 'score-button' : 'hidden-button'}
-                onPointerUp={(event) => handleScorePointerUp(event, () => onRemovePoint(index))}
-                onKeyDown={(event) => handleScoreKeyDown(event, () => onRemovePoint(index))}
-                aria-label={`Remove point from ${player.name}`}
-              >
-                -
-              </button>
-              <button
-                type="button"
-                className={config.buttons.points ? 'score-button' : 'hidden-button'}
-                onPointerUp={(event) => handleScorePointerUp(event, () => onAddPoint(index))}
-                onKeyDown={(event) => handleScoreKeyDown(event, () => onAddPoint(index))}
-                aria-label={`Add point to ${player.name}`}
-              >
-                +
-              </button>
-            </div>
+            {config.buttons.points && (
+              <div className="score-buttons">
+                <button
+                  type="button"
+                  className="score-button"
+                  onPointerUp={(event) => handleScorePointerUp(event, () => onRemovePoint(index))}
+                  onKeyDown={(event) => handleScoreKeyDown(event, () => onRemovePoint(index))}
+                  aria-label={`Remove point from ${player.name}`}
+                >
+                  <span className="score-button-symbol score-button-symbol-minus" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="score-button"
+                  onPointerUp={(event) => handleScorePointerUp(event, () => onAddPoint(index))}
+                  onKeyDown={(event) => handleScoreKeyDown(event, () => onAddPoint(index))}
+                  aria-label={`Add point to ${player.name}`}
+                >
+                  <span className="score-button-symbol score-button-symbol-plus" aria-hidden="true" />
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

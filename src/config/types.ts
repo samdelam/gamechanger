@@ -43,6 +43,14 @@ export type CoverConfig = {
   imageDataUrl: string
 }
 
+export type AssetsConfig = {
+  sounds: {
+    slideDataUrl: string
+    gainPointsDataUrl: string
+    losePointsDataUrl: string
+  }
+}
+
 export type WinnerConfig = {
   enabled: boolean
   single: {
@@ -61,6 +69,7 @@ export type GameConfig = {
   slides: SlidesConfig
   scoreboard: ScoreboardConfig
   cover: CoverConfig
+  assets: AssetsConfig
   winner: WinnerConfig
 }
 
