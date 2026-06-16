@@ -224,7 +224,7 @@ button:disabled {
 
 .scoreboard-player h2 {
   font-size: 4.5vmin;
-  line-height: 1;
+  line-height: 1.12;
   margin: 0;
   padding: 0;
   color: #f2f2f2;
