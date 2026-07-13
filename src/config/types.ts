@@ -5,8 +5,14 @@ export type PlayerConfig = {
   canWin: boolean
 }
 
+export type SlideMediaConfig = {
+  imageDataUrl: string
+  videoDataUrl: string
+}
+
 export type SlidesConfig = {
   content: string[]
+  media: SlideMediaConfig[]
   buttons: {
     slide: boolean
     settings: boolean

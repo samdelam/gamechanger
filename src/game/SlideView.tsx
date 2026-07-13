@@ -1,8 +1,9 @@
-import type { RuntimePlayer, WinnerConfig } from '../config/types'
+import type { RuntimePlayer, SlideMediaConfig, WinnerConfig } from '../config/types'
 
 type Props = {
   slideIndex: number
   slides: string[]
+  slideMedia: SlideMediaConfig[]
   hasCover: boolean
   coverLoaded: boolean | null
   coverSrc: string | null
@@ -59,6 +60,7 @@ function WinnerScreen({ players, winnerConfig }: { players: RuntimePlayer[]; win
 export function SlideView({
   slideIndex,
   slides,
+  slideMedia,
   hasCover,
   coverLoaded,
   coverSrc,
@@ -77,6 +79,7 @@ export function SlideView({
   const isWinnerSlide = winnerEnabled && slideIndex === winnerIndex
   const textIndex = slideIndex - offset
   const currentSlide = textIndex >= 0 && textIndex < slides.length ? slides[textIndex] : ''
+  const currentSlideMedia = textIndex >= 0 && textIndex < slideMedia.length ? slideMedia[textIndex] : { imageDataUrl: '', videoDataUrl: '' }
   const maxSlide = (winnerEnabled ? slides.length : slides.length - 1) + offset
 
   return (
@@ -95,8 +98,20 @@ export function SlideView({
       ) : isWinnerSlide ? (
         <WinnerScreen players={players} winnerConfig={winnerConfig} />
       ) : (
-        <div className="slide-text" style={{ fontSize: `${textFontSize(currentSlide)}vmin` }}>
-          {currentSlide}
+        <div className="slide-content">
+          {(currentSlideMedia.imageDataUrl || currentSlideMedia.videoDataUrl) && (
+            <div className="slide-media-frame">
+              {currentSlideMedia.imageDataUrl && (
+                <img className="slide-media-image" src={currentSlideMedia.imageDataUrl} alt="" />
+              )}
+              {currentSlideMedia.videoDataUrl && (
+                <video className="slide-media-video" src={currentSlideMedia.videoDataUrl} controls playsInline preload="metadata" />
+              )}
+            </div>
+          )}
+          <div className="slide-text" style={{ fontSize: `${textFontSize(currentSlide)}vmin` }}>
+            {currentSlide}
+          </div>
         </div>
       )}
 

@@ -224,6 +224,7 @@ export function App() {
       <SlideView
         slideIndex={slideIndex}
         slides={config.slides.content}
+        slideMedia={config.slides.media}
         hasCover={hasCover}
         coverLoaded={coverLoaded}
         coverSrc={coverSrc}

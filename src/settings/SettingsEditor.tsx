@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
 import { defaultConfig } from '../config/defaultConfig'
-import type { GameConfig, PlayerConfig } from '../config/types'
+import type { GameConfig, PlayerConfig, SlideMediaConfig } from '../config/types'
 import { downloadConfig, readImportedConfig } from '../config/configStorage'
 
 const tabs = ['Players', 'Slides', 'Scoreboard', 'Assets', 'Winner'] as const
 type Tab = typeof tabs[number]
 const modifierKeys = ['Alt', 'Ctrl', 'Cmd', 'Meta', 'Mod', 'Option', 'Shift'] as const
 type SoundAssetKey = keyof GameConfig['assets']['sounds']
+type SlideMediaAssetKey = keyof SlideMediaConfig
+
+const MAX_IMAGE_FILE_SIZE_BYTES = 5 * 1024 * 1024
+const MAX_VIDEO_FILE_SIZE_BYTES = 8 * 1024 * 1024
 
 type Props = {
   config: GameConfig
@@ -27,6 +31,31 @@ function moveItem<T>(items: T[], index: number, direction: -1 | 1): T[] {
   return next
 }
 
+function createSlideMedia(): SlideMediaConfig {
+  return {
+    imageDataUrl: '',
+    videoDataUrl: '',
+  }
+}
+
+function ensureSlideMediaShape(config: GameConfig): GameConfig {
+  const media = Array.isArray(config.slides.media) ? config.slides.media.map((item) => ({
+    imageDataUrl: item?.imageDataUrl ?? '',
+    videoDataUrl: item?.videoDataUrl ?? '',
+  })) : []
+
+  while (media.length < config.slides.content.length) {
+    media.push(createSlideMedia())
+  }
+
+  if (media.length > config.slides.content.length) {
+    media.length = config.slides.content.length
+  }
+
+  config.slides.media = media
+  return config
+}
+
 function newPlayer(number: number, template?: PlayerConfig): PlayerConfig {
   return {
     name: `PLAYER ${number}`,
@@ -44,10 +73,10 @@ function readFileAsDataUrl(file: File): Promise<string> {
       if (typeof reader.result === 'string') {
         resolve(reader.result)
       } else {
-        reject(new Error('Could not read image file'))
+        reject(new Error('Could not read selected file'))
       }
     }
-    reader.onerror = () => reject(new Error('Could not read image file'))
+    reader.onerror = () => reject(new Error('Could not read selected file'))
     reader.readAsDataURL(file)
   })
 }
@@ -137,14 +166,14 @@ export function SettingsEditor({
   onPreviewGainPointsSound,
   onPreviewLosePointsSound,
 }: Props) {
-  const [draft, setDraft] = useState<GameConfig>(() => structuredClone(config))
+  const [draft, setDraft] = useState<GameConfig>(() => ensureSlideMediaShape(structuredClone(config)))
   const [activeTab, setActiveTab] = useState<Tab>('Players')
   const [importError, setImportError] = useState('')
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
   const firstPlayer = useMemo(() => draft.players[0], [draft.players])
 
   const updateDraft = (updater: (current: GameConfig) => GameConfig) => {
-    setDraft((current) => updater(structuredClone(current)))
+    setDraft((current) => ensureSlideMediaShape(updater(structuredClone(current))))
   }
 
   const requestConfirmation = (nextConfirmation: Confirmation) => {
@@ -155,13 +184,44 @@ export function SettingsEditor({
     if (!file) return
     try {
       const imported = await readImportedConfig(file)
-      setDraft(imported)
+      setDraft(ensureSlideMediaShape(imported))
       setImportError('')
     } catch (error) {
       setImportError(error instanceof Error ? error.message : 'Could not import config')
     }
   }
 
+  const importSlideMedia = async (file: File | null, slideIndex: number, key: SlideMediaAssetKey) => {
+    if (!file) return
+
+    const isImage = key === 'imageDataUrl'
+    const expectedType = isImage ? 'image/' : 'video/'
+    const maxFileSize = isImage ? MAX_IMAGE_FILE_SIZE_BYTES : MAX_VIDEO_FILE_SIZE_BYTES
+    const fileLabel = isImage ? 'image' : 'video'
+
+    if (!file.type.startsWith(expectedType)) {
+      setImportError(`Please choose a ${fileLabel} file`)
+      return
+    }
+
+    if (file.size > maxFileSize) {
+      const limitMb = maxFileSize / (1024 * 1024)
+      setImportError(`Please choose a ${fileLabel} file smaller than ${limitMb} MB`)
+      return
+    }
+
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
+      updateDraft((current) => {
+        current.slides.media[slideIndex] ??= createSlideMedia()
+        current.slides.media[slideIndex][key] = dataUrl
+        return current
+      })
+      setImportError('')
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : `Could not import ${fileLabel} file`)
+    }
+  }
 
   const importCoverImage = async (file: File | null) => {
     if (!file) return
@@ -442,35 +502,94 @@ export function SettingsEditor({
                   <span className="settings-hint">Empty slides are allowed. Use ↑ and ↓ to reorder slides.</span>
                 </div>
 
-                {draft.slides.content.map((slide, index) => (
-                  <div className="slide-edit-row" key={index}>
-                    <strong>Slide {index + 1}</strong>
-                    <input
-                      aria-label={`Slide ${index + 1} text`}
-                      value={slide}
-                      onChange={(event) => updateDraft((current) => {
-                        current.slides.content[index] = event.target.value
+                {draft.slides.content.map((slide, index) => {
+                  const media = draft.slides.media[index] ?? createSlideMedia()
+
+                  return (
+                    <div className="slide-edit-row" key={index}>
+                      <strong>Slide {index + 1}</strong>
+                      <div className="slide-edit-stack">
+                        <input
+                          aria-label={`Slide ${index + 1} text`}
+                          value={slide}
+                          onChange={(event) => updateDraft((current) => {
+                            current.slides.content[index] = event.target.value
+                            return current
+                          })}
+                        />
+                        <div className="slide-media-controls">
+                          <span className="settings-hint">Image limit: {MAX_IMAGE_FILE_SIZE_BYTES / (1024 * 1024)} MB. Video limit: {MAX_VIDEO_FILE_SIZE_BYTES / (1024 * 1024)} MB.</span>
+                          <div className="slide-media-inputs">
+                            <label className="settings-field asset-file-field">
+                              <span>Slide image</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => {
+                                  importSlideMedia(event.currentTarget.files?.[0] ?? null, index, 'imageDataUrl')
+                                  event.currentTarget.value = ''
+                                }}
+                              />
+                            </label>
+                            <label className="settings-field asset-file-field">
+                              <span>Slide video</span>
+                              <input
+                                type="file"
+                                accept="video/*"
+                                onChange={(event) => {
+                                  importSlideMedia(event.currentTarget.files?.[0] ?? null, index, 'videoDataUrl')
+                                  event.currentTarget.value = ''
+                                }}
+                              />
+                            </label>
+                          </div>
+                          {(media.imageDataUrl || media.videoDataUrl) && (
+                            <div className="slide-media-preview-grid">
+                              {media.imageDataUrl && (
+                                <img className="slide-media-preview" src={media.imageDataUrl} alt={`Preview for slide ${index + 1}`} />
+                              )}
+                              {media.videoDataUrl && (
+                                <video className="slide-media-preview" src={media.videoDataUrl} controls playsInline preload="metadata" />
+                              )}
+                              <button
+                                type="button"
+                                className="secondary-button"
+                                onClick={() => updateDraft((current) => {
+                                  current.slides.media[index] ??= createSlideMedia()
+                                  current.slides.media[index].imageDataUrl = ''
+                                  current.slides.media[index].videoDataUrl = ''
+                                  return current
+                                })}
+                              >
+                                Remove slide media
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <button type="button" className="secondary-button icon-action-button" disabled={index === 0} onClick={() => updateDraft((current) => {
+                        current.slides.content = moveItem(current.slides.content, index, -1)
+                        current.slides.media = moveItem(current.slides.media, index, -1)
                         return current
-                      })}
-                    />
-                    <button type="button" className="secondary-button icon-action-button" disabled={index === 0} onClick={() => updateDraft((current) => {
-                      current.slides.content = moveItem(current.slides.content, index, -1)
-                      return current
-                    })}>↑</button>
-                    <button type="button" className="secondary-button icon-action-button" disabled={index === draft.slides.content.length - 1} onClick={() => updateDraft((current) => {
-                      current.slides.content = moveItem(current.slides.content, index, 1)
-                      return current
-                    })}>↓</button>
-                    <button type="button" className="danger-button icon-action-button" title="Remove slide" aria-label={`Remove slide ${index + 1}`} onClick={() => updateDraft((current) => {
-                      current.slides.content.splice(index, 1)
-                      return current
-                    })}>🗑️</button>
-                  </div>
-                ))}
+                      })}>↑</button>
+                      <button type="button" className="secondary-button icon-action-button" disabled={index === draft.slides.content.length - 1} onClick={() => updateDraft((current) => {
+                        current.slides.content = moveItem(current.slides.content, index, 1)
+                        current.slides.media = moveItem(current.slides.media, index, 1)
+                        return current
+                      })}>↓</button>
+                      <button type="button" className="danger-button icon-action-button" title="Remove slide" aria-label={`Remove slide ${index + 1}`} onClick={() => updateDraft((current) => {
+                        current.slides.content.splice(index, 1)
+                        current.slides.media.splice(index, 1)
+                        return current
+                      })}>🗑️</button>
+                    </div>
+                  )
+                })}
 
                 <div className="settings-list-footer">
                   <button type="button" className="secondary-button" onClick={() => updateDraft((current) => {
                     current.slides.content.push('')
+                    current.slides.media.push(createSlideMedia())
                     return current
                   })}>➕ Add slide</button>
                   <button
@@ -482,6 +601,7 @@ export function SettingsEditor({
                         confirmClassName: 'warning-button',
                         onConfirm: () => updateDraft((current) => {
                           current.slides.content = structuredClone(defaultConfig.slides.content)
+                          current.slides.media = structuredClone(defaultConfig.slides.media)
                           return current
                         }),
                       })

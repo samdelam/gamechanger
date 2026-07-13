@@ -10,6 +10,14 @@ export const defaultConfig: GameConfig = {
       "DON'T SWEAR",
       'END OF GAME',
     ],
+    media: [
+      { imageDataUrl: '', videoDataUrl: '' },
+      { imageDataUrl: '', videoDataUrl: '' },
+      { imageDataUrl: '', videoDataUrl: '' },
+      { imageDataUrl: '', videoDataUrl: '' },
+      { imageDataUrl: '', videoDataUrl: '' },
+      { imageDataUrl: '', videoDataUrl: '' },
+    ],
     buttons: {
       slide: true,
       settings: true,
